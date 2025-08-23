@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Your Perfect Room - Local Room Search</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50b3a2;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --light-text-color: #777;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--card-bg);
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 2.5em;
+        }
+
+        .header p {
+            margin-top: 5px;
+            color: var(--light-text-color);
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        #search-input {
+            width: 70%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #search-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Rooms Grid */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .room-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .room-info {
+            padding: 15px;
+        }
+
+        .room-info h3 {
+            margin: 0 0 10px;
+            color: var(--primary-color);
+            font-size: 1.5em;
+        }
+
+        .room-info p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: var(--light-text-color);
+        }
+
+        .room-info .price {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .book-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .book-btn:hover {
+            background-color: #46a292;
+        }
+
+        .no-rooms-found {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--light-text-color);
+            margin-top: 50px;
+            display: none;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--card-bg);
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            margin-top: 40px;
+            color: var(--light-text-color);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            #search-input {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Find Your Room</h1>
+        <p>Aapke budget aur location ke hisaab se, aapka perfect room dhoondiye.</p>
+    </div>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Search by location (e.g., Bhopal, Indore, Khandwa)...">
+        </div>
+
+        <div class="rooms-grid" id="rooms-grid">
+            </div>
+
+        <div class="no-rooms-found" id="no-rooms-message">
+            Koi bhi room nahi mila. Kripya doosri location search karein.
+        </div>
+    </div>
+
+    <footer class="footer">
+        &copy; 2025 Local Room Search. All Rights Reserved.
+    </footer>
+
+    <script>
+        const rooms = [
+            {
+                name: 'Cozy Room in Indra Nagar',
+                location: 'Bhopal',
+                price: '₹5,500/month',
+                description: 'A comfortable room with attached bathroom, perfect for students. Close to local market and bus stops.',
+                image: 'https://via.placeholder.com/600x400?text=Room+1'
+            },
+            {
+                name: 'Spacious Flat for Rent',
+                location: 'Indore',
+                price: '₹8,000/month',
+                description: '2-BHK flat with a balcony, situated in a quiet residential area. All amenities available nearby.',
+                image: 'https://via.placeholder.com/600x400?text=Room+2'
+            },
+            {
+                name: 'Single Room near Railway Station',
+                location: 'Khandwa',
+                price: '₹4,000/month',
+                description: 'Budget-friendly room, ideal for single occupants. 10 mins walk from railway station.',
+                image: 'https://via.placeholder.com/600x400?text=Room+3'
+            },
+            {
+                name: 'Modern Studio Apartment',
+                location: 'Pune',
+                price: '₹12,000/month',
+                description: 'Fully furnished studio with a modular kitchen and modern fixtures. Great for working professionals.',
+                image: 'https://via.placeholder.com/600x400?text=Room+4'
+            },
+            {
+                name: 'Room on Rent in Vijay Nagar',
+                location: 'Indore',
+                price: '₹6,500/month',
+                description: 'A clean and well-maintained room in a shared apartment. Close to IT parks and shopping malls.',
+                image: 'https://via.placeholder.com/600x400?text=Room+5'
+            },
+            {
+                name: 'Room for Boys, Laxmi Nagar',
+                location: 'Bhopal',
+                price: '₹5,000/month',
+                description: 'Single occupancy room with mess facility. Located in a safe and secure colony.',
+                image: 'https://via.placeholder.com/600x400?text=Room+6'
+            },
+            {
+                name: 'Budget Room near College',
+                location: 'Khandwa',
+                price: '₹3,500/month',
+                description: 'A small but clean room located near the main college area. Includes basic furniture.',
+                image: 'https://via.placeholder.com/600x400?text=Room+7'
+            }
+        ];
+
+        const roomsGrid = document.getElementById('rooms-grid');
+        const searchInput = document.getElementById('search-input');
+        const noRoomsMessage = document.getElementById('no-rooms-message');
+
+        function renderRooms(filteredRooms) {
+            roomsGrid.innerHTML = '';
+            if (filteredRooms.length === 0) {
+                noRoomsMessage.style.display = 'block';
+            } else {
+                noRoomsMessage.style.display = 'none';
+                filteredRooms.forEach(room => {
+                    const card = document.createElement('div');
+                    card.className = 'room-card';
+                    card.innerHTML = `
+                        <img src="${room.image}" alt="${room.name}">
+                        <div class="room-info">
+                            <h3>${room.name}</h3>
+                            <p><strong>Location:</strong> ${room.location}</p>
+                            <p class="price"><strong>Rent:</strong> ${room.price}</p>
+                            <p>${room.description}</p>
+                            <a href="#" class="book-btn">Book Now</a>
+                        </div>
+                    `;
+                    roomsGrid.appendChild(card);
+                });
+            }
+        }
+
+        searchInput.addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredRooms = rooms.filter(room =>
+                room.location.toLowerCase().includes(searchTerm) ||
+                room.name.toLowerCase().includes(searchTerm)
+            );
+            renderRooms(filteredRooms);
+        });
+
+        // Initial render of all rooms
+        document.addEventListener('DOMContentLoaded', () => {
+            renderRooms(rooms);
+        });
+    </script>
+
+</body>
+</html>
