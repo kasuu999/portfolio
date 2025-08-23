@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCTV Monitoring Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap');
+
+        :root {
+            --bg-color: #121212;
+            --main-feed-bg: #000;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --primary-color: #4a90e2;
+            --accent-color: #ff3b30;
+            --online-color: #4cd964;
+            --offline-color: #ff3b30;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            color: var(--primary-color);
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .online {
+            background-color: var(--online-color);
+        }
+
+        .offline {
+            background-color: var(--offline-color);
+        }
+
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .main-feed {
+            background-color: var(--main-feed-bg);
+            border: 1px solid var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-feed img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .main-feed-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .small-feeds {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .feed-card {
+            background-color: var(--card-bg);
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .feed-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+        }
+
+        .feed-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .feed-label {
+            position: absolute;
+            bottom: 5px;
+            left: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.7em;
+        }
+
+        .controls {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+
+        .controls h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .control-group button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-family: 'Roboto Mono', monospace;
+            transition: background-color 0.2s;
+        }
+
+        .control-group button:hover {
+            background-color: #3b74b1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-top: 2px solid var(--primary-color);
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .small-feeds {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .small-feeds {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>CCTV Monitoring Dashboard</h1>
+        <div class="status-info">
+            <span class="status-item">
+                <span class="status-dot online"></span>
+                <span id="online-count">4</span> Cameras Online
+            </span>
+            <span class="status-item">
+                <span class="status-dot offline"></span>
+                <span id="offline-count">0</span> Cameras Offline
+            </span>
+            <span class="status-item">
+                <span class="recording-dot"></span>
+                <span id="recording-status">Recording...</span>
+            </span>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="main-feed">
+            <img src="https://via.placeholder.com/1280x720?text=Main+Feed+-+Camera+1" alt="Main CCTV Feed" id="main-video">
+            <div class="main-feed-label">
+                <span class="recording-dot"></span>
+                <span id="main-feed-name">Camera 1</span>
+            </div>
+        </div>
+        <div class="sidebar">
+            <div class="small-feeds">
+                <div class="feed-card" onclick="changeMainFeed(1)">
+                    <img src="https://via.placeholder.com/640x360?text=Camera+1" alt="Camera 1">
+                    <span class="feed-label">Camera 1</span>
+                </div>
+                <div class="feed-card" onclick="changeMainFeed(2)">
+                    <img src="https://via.placeholder.com/640x360?text=Camera+2" alt="Camera 2">
+                    <span class="feed-label">Camera 2</span>
+                </div>
+                <div class="feed-card" onclick="changeMainFeed(3)">
+                    <img src="https://via.placeholder.com/640x360?text=Camera+3" alt="Camera 3">
+                    <span class="feed-label">Camera 3</span>
+                </div>
+                <div class="feed-card" onclick="changeMainFeed(4)">
+                    <img src="https://via.placeholder.com/640x360?text=Camera+4" alt="Camera 4">
+                    <span class="feed-label">Camera 4</span>
+                </div>
+            </div>
+            <div class="controls">
+                <h3>Controls</h3>
+                <div class="control-group">
+                    <label for="camera-select">Select Camera:</label>
+                    <select id="camera-select">
+                        <option value="1">Camera 1</option>
+                        <option value="2">Camera 2</option>
+                        <option value="3">Camera 3</option>
+                        <option value="4">Camera 4</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <button onclick="startRecording()">Start Recording</button>
+                    <button onclick="stopRecording()">Stop Recording</button>
+                </div>
+                <div class="control-group">
+                    <button onclick="panLeft()">Pan Left</button>
+                    <button onclick="panRight()">Pan Right</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        &copy; 2025 CCTV Dashboard. All Rights Reserved.
+    </footer>
+
+    <script>
+        // Data for feeds (simulated)
+        const cameraData = {
+            1: {
+                name: 'Camera 1',
+                mainImage: 'https://via.placeholder.com/1280x720?text=Main+Feed+-+Camera+1',
+                smallImage: 'https://via.placeholder.com/640x360?text=Camera+1'
+            },
+            2: {
+                name: 'Camera 2',
+                mainImage: 'https://via.placeholder.com/1280x720?text=Main+Feed+-+Camera+2',
+                smallImage: 'https://via.placeholder.com/640x360?text=Camera+2'
+            },
+            3: {
+                name: 'Camera 3',
+                mainImage: 'https://via.placeholder.com/1280x720?text=Main+Feed+-+Camera+3',
+                smallImage: 'https://via.placeholder.com/640x360?text=Camera+3'
+            },
+            4: {
+                name: 'Camera 4',
+                mainImage: 'https://via.placeholder.com/1280x720?text=Main+Feed+-+Camera+4',
+                smallImage: 'https://via.placeholder.com/640x360?text=Camera+4'
+            }
+        };
+
+        function changeMainFeed(cameraId) {
+            const feed = cameraData[cameraId];
+            document.getElementById('main-video').src = feed.mainImage;
+            document.getElementById('main-feed-name').textContent = feed.name;
+        }
+
+        // Simulated control functions
+        function startRecording() {
+            alert('Recording started for ' + document.getElementById('main-feed-name').textContent);
+        }
+
+        function stopRecording() {
+            alert('Recording stopped for ' + document.getElementById('main-feed-name').textContent);
+        }
+
+        function panLeft() {
+            alert('Panning left...');
+        }
+        
+        function panRight() {
+            alert('Panning right...');
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('online-count').textContent = Object.keys(cameraData).length;
+            document.getElementById('offline-count').textContent = '0';
+        });
+
+    </script>
+
+</body>
+</html>
